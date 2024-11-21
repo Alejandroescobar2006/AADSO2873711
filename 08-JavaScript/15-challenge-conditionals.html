@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge</title>
+    <link rel="stylesheet" href="css/master.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: rgba(0, 0, 255, 0.171);
+        }
+        header h1 {
+            text-align: center;
+            position: relative;
+            margin: 0 auto;
+        }
+        section {
+            background: url("./images/conditional/bg.svg") no-repeat center;
+            background-size: 300px;
+            position: relative;
+            justify-content: center;
+            border-radius: 15px;
+            margin: 0 auto;
+            height: 400px;
+            width: 400px;
+        }
+        section h3 {
+            text-align: center;
+            padding: 0.3rem;
+        }
+        section hr {
+            border: 2px solid #f0db4f;
+            margin: 2rem 0;
+        }
+        section h4.day {
+            align-items: center;
+            background-color: #f0db4f;
+            font-size: 1.4rem;
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+        section img.icon {
+            zoom: 3;
+        }
+        div.locate{
+            background: url("./images/conditional/locate.svg") no-repeat;
+            height: 35px;
+            width: 35px;
+            background-size: 35px;
+        }
+        section.dark{
+            background: url("./images/conditional/bg-dark.svg") no-repeat center;
+            background-size: 300px;
+            color: white;
+            div.locate{
+                background: url("./images/conditional/locate-dark.svg") no-repeat;
+                background-size: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Conditionals</h1>
+    </header>
+    <section class="flex flex-col items-center container">
+        <h4 class="country text-[15px]"></h4>
+        <div class="flex items-center">
+            <div class="locate"></div>
+            <h3 class="city text-[24px] font-bold"></h3>
+        </div>
+        <div class="flex">
+            <h4 class="temp text-[48px] font-bold z-[100]"></h4>
+            <img src="" alt="Icon" class="icon absolute z-1 w-[30px] top-[50px]">
+        </div>
+        <h4 class="condition w-[95px] h-[25px] bg-[#0003] text-[12px] flex items-center rounded-[20px] justify-center mb-3"></h4>
+        <div class="flex gap-3">
+            <h4 class="humidity w-[95px] h-[25px] bg-[#0003] text-[12px] flex items-center rounded-[20px] justify-center"></h4>
+            <h4 class="cloud w-[95px] h-[25px] bg-[#0003] text-[12px] flex items-center rounded-[20px] justify-center"></h4>
+        </div>
+    </section>
+    <script>
+        const temp = document.querySelector('.temp')
+        const url = 'http://api.weatherapi.com/v1/current.json?key=9711613e634d413785c161102241511&q=Manizales';
+        const icon = document.querySelector(".icon")
+        const country = document.querySelector(".country")
+        const city = document.querySelector(".city")
+        const condition = document.querySelector(".condition")
+        const humidity = document.querySelector(".humidity")
+        const cloud = document.querySelector(".cloud")
+        const container = document.querySelector(".container")
+
+        const loadWeather = async () => {
+            const response = await fetch(url)
+            const data = await response.json()
+            temp.textContent = data.current.temp_c
+            icon.setAttribute('src', data.current.condition.icon)
+            country.textContent = data.location.country
+            city.textContent = data.location.name
+            condition.textContent = "Condition: " + data.current.condition.text
+            humidity.textContent = "Humidity: " + data.current.humidity
+            cloud.textContent = "Cloud: " + data.current.cloud
+            if (data.current.is_day == 1) {
+                container.classList.remove("dark")
+            }else{
+                container.classList.add("dark")
+            }
+            //console.log(data.current.temp_c)
+        }
+        loadWeather()
+    </script>
+</body>
+</html>
