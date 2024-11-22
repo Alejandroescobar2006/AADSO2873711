@@ -62,24 +62,33 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>Conditionals</h1>
-    </header>
-    <section class="flex flex-col items-center container">
-        <h4 class="country text-[15px]"></h4>
+    <nav class="controls">
+        <a href="index.html"> <!-- ../para devolverme  -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
+        </a>
+    </nav>
+    <main>
+        <header>
+            <h1>Challenge</h1>
+        </header>
+         <section class="flex flex-col items-center container">
+            <h4 class="country text-[15px]"></h4>
         <div class="flex items-center">
             <div class="locate"></div>
-            <h3 class="city text-[24px] font-bold"></h3>
+            <h3 class="city text-[24px] font-bold text-black"></h3>
         </div>
         <div class="flex">
-            <h4 class="temp text-[48px] font-bold z-[100]"></h4>
+            <h4 class="temp text-[48px] font-bold z-[100] text-black"></h4>
             <img src="" alt="Icon" class="icon absolute z-1 w-[30px] top-[50px]">
         </div>
-        <h4 class="condition w-[95px] h-[25px] bg-[#0003] text-[12px] flex items-center rounded-[20px] justify-center mb-3"></h4>
+        <h4 class="condition w-[180px] h-[25px] bg-[#0003] text-[12px] flex items-center rounded-[20px] justify-center mb-3"></h4>
         <div class="flex gap-3">
             <h4 class="humidity w-[95px] h-[25px] bg-[#0003] text-[12px] flex items-center rounded-[20px] justify-center"></h4>
             <h4 class="cloud w-[95px] h-[25px] bg-[#0003] text-[12px] flex items-center rounded-[20px] justify-center"></h4>
-        </div>
+        </div> 
+      
+        <h4 class="update  w-[180px] h-[25px] bg-[#0003] text-[12px] flex items-center rounded-[20px] justify-center mb-3 relative top-3"></h4>
+    
     </section>
     <script>
         const temp = document.querySelector('.temp')
@@ -90,6 +99,7 @@
         const condition = document.querySelector(".condition")
         const humidity = document.querySelector(".humidity")
         const cloud = document.querySelector(".cloud")
+        const update = document.querySelector(".update")
         const container = document.querySelector(".container")
 
         const loadWeather = async () => {
@@ -102,7 +112,8 @@
             condition.textContent = "Condition: " + data.current.condition.text
             humidity.textContent = "Humidity: " + data.current.humidity
             cloud.textContent = "Cloud: " + data.current.cloud
-            if (data.current.is_day == 1) {
+            update.textContent = "" + data.location.localtime
+            if (data.current.is_day == 0) {
                 container.classList.remove("dark")
             }else{
                 container.classList.add("dark")
@@ -111,5 +122,9 @@
         }
         loadWeather()
     </script>
+
+     
+    </main>  
+
 </body>
 </html>
