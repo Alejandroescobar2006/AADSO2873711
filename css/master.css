@@ -39,7 +39,7 @@ main {
             font-weight: 500;
         }
         img {
-            border-radius:50%;
+            border-radius:100%;
             border: 6px solid black;
             width: 160px;
         }
