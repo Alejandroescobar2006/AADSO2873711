@@ -5,7 +5,6 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='215' height='215' viewBox='0 0 200 200'%3E%3Cpolygon fill='%23DCEFFA' points='100 0 0 100 100 100 100 200 200 100 200 0'/%3E%3C/svg%3E");
     font-family: Poppins, serif;
 }
-
 main {
     display: flex;
     flex-direction: column;
@@ -40,7 +39,7 @@ main {
             font-weight: 500;
         }
         img {
-            border-radius: 100%;
+            border-radius:50%;
             border: 6px solid black;
             width: 160px;
         }
