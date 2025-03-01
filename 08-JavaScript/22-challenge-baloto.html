@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/master.css">
+    <title>Simulador de Baloto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .area-juego {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background-image: url('/08-JavaScript/images/17253019837040.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .contenedor-bolas {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .bola {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 3px solid white;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .bola:hover {
+            transform: scale(1.05);
+        }
+        
+        .contenedor-bola-premio {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            /* Aumentado el margen inferior */
+        }
+        
+        .bola-premio {
+            width: 112px;
+            height: 112px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            background: linear-gradient(145deg, #ffd700, #ffcc00);
+            border: 4px solid white;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .bola-premio:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .boton-jugar {
+            padding: 12px 32px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background: #4188e4;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            /* Ya no es absoluto para que se coloque debajo de la bola premio */
+            position: relative;
+            bottom: 0;
+        }
+        
+        .boton-jugar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .boton-jugar:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .boton-jugar:disabled {
+            background: linear-gradient(to right, #cccccc, #999999);
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="area-juego">
+        <div class="contenedor-bolas">
+            <div class="bola"><span>-</span></div>
+            <div class="bola"><span>-</span></div>
+            <div class="bola"><span>-</span></div>
+            <div class="bola"><span>-</span></div>
+            <div class="bola"><span>-</span></div>
+        </div>
+        <div class="contenedor-bola-premio">
+            <div class="bola-premio"><span>-</span></div>
+        </div>
+        <button id="botonSorteo" class="boton-jugar">Iniciar</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const botonSorteo = document.getElementById('botonSorteo');
+            const bolasRegulares = Array.from(document.querySelectorAll('.bola span'));
+            const bolaPremio = document.querySelector('.bola-premio span');
+
+            let sorteoActivo = false;
+
+            function numeroAleatorio() {
+                return Math.floor(Math.random() * 100) + 1;
+            }
+
+            function numeroAleatorioPremio() {
+                return Math.floor(Math.random() * 10) + 1;
+            }
+
+            botonSorteo.addEventListener('click', function() {
+                if (sorteoActivo) return;
+                sorteoActivo = true;
+                botonSorteo.disabled = true;
+
+                bolasRegulares.forEach(bola => bola.textContent = "-");
+                bolaPremio.textContent = "-";
+
+                let contador = 0;
+                const intervalo = setInterval(() => {
+                    bolasRegulares.forEach(bola => bola.textContent = numeroAleatorio());
+                    bolaPremio.textContent = numeroAleatorioPremio();
+                    contador++;
+
+                    if (contador >= 10) {
+                        clearInterval(intervalo);
+                        bolasRegulares.forEach(bola => bola.textContent = numeroAleatorio());
+                        bolaPremio.textContent = numeroAleatorioPremio();
+                        botonSorteo.disabled = false;
+                        sorteoActivo = false;
+                    }
+                }, 100);
+            });
+        });
+    </script>
+</body>
+
+</html>
