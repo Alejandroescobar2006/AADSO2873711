@@ -20,7 +20,6 @@
         padding: 20px;
         justify-content: center;
     }
-    /* Modificado para permitir scroll horizontal */
     
     #selectedPlayers {
         display: flex;
@@ -34,20 +33,16 @@
     .seccion {
         display: flex;
         flex-direction: column;
-        /* Organiza elementos en columna (uno debajo del otro) */
         justify-content: center;
         align-items: center;
         border-radius: .8rem;
         margin: 20px;
         width: 150px;
         height: auto;
-        /* Cambiado de 200px a auto para adaptarse al contenido */
         padding-bottom: 10px;
-        /* Espacio adicional para el nombre */
         background: #00000000;
         text-align: center;
     }
-    /* Estilo unificado para todas las imágenes de jugadores */
     
     .player-img {
         width: 130px;
@@ -55,9 +50,7 @@
         object-fit: contain;
         cursor: pointer;
         margin-bottom: 8px;
-        /* Espacio entre la imagen y el nombre */
     }
-    /* Estilo para los nombres de jugadores */
     
     .player-name {
         margin: 0;
@@ -68,7 +61,6 @@
         text-align: center;
         width: 100%;
         display: block;
-        /* Asegura que sea un bloque completo */
     }
     
     .buttoms {
@@ -86,7 +78,6 @@
         height: 30px;
         cursor: pointer;
         opacity: 1;
-        /* Asegurar que todos los botones tengan opacidad completa */
     }
     
     .round-btn {
@@ -136,7 +127,6 @@
         color: #d5ec06;
         z-index: 1;
     }
-    /* Arreglado para posicionar correctamente los elementos */
     
     .seccion1 {
         display: flex;
@@ -153,12 +143,10 @@
         position: relative;
         flex-shrink: 0;
     }
-    /* Estilo para jugadores seleccionados */
     
     .selected {
         border: 3px solid #4CAF50;
     }
-    /* Estilo para los contenedores finales con jugador */
     
     .seccion1 img {
         max-width: 130px;
@@ -169,23 +157,17 @@
     
     .seccion1.selected {
         border: 3px solid #FF0000;
-        /* Borde rojo */
     }
     
     .seccion.selected {
         transform: scale(1.1);
-        /* Aumenta el tamaño */
         border: 3px solid #4CAF50;
-        /* Borde verde */
         transition: transform 0.2s, border 0.2s;
-        /* Animación suave */
     }
-    /* Estilo para cuando un jugador es seleccionado */
     
     .seccion.selected .player-name {
         color: #4CAF50;
     }
-    /* Estilo para scroll */
     
     #selectedPlayers::-webkit-scrollbar {
         height: 8px;
@@ -336,7 +318,6 @@
     </main>
 
     <script>
-        // Botones
         const botonAgregarInicio = document.querySelector('#btnAgregar');
         const botonAgregarFinal = document.querySelector('#btnUltimo');
         const botonAgregar = document.querySelector('#btnAdd');
@@ -344,31 +325,24 @@
         const botonEliminar = document.querySelector('#btnEiminar');
         const inputIndiceJugador = document.querySelector('#playerIndex');
 
-        // Imágenes de jugadores
         const seccionesJugadores = document.querySelectorAll('.seccion');
         const imagenesJugadores = document.querySelectorAll('.player-img');
 
-        // Posiciones para jugadores seleccionados
         const contenedorJugadoresSeleccionados = document.querySelector('#selectedPlayers');
         const posicionesJugadores = document.querySelectorAll('.seccion1');
 
-        // Variables
         let jugadoresSeleccionados = [];
         let jugadorActual = null;
         let posicionActual = '';
         let accionActual = 'agregar';
 
-        // Funciones
         function actualizarVistaJugadores() {
-            // Limpiar todas las posiciones
             posicionesJugadores.forEach(posicion => {
-                // Mantener solo el número
                 const numeroPosicion = posicion.querySelector('.final');
                 posicion.innerHTML = '';
                 posicion.appendChild(numeroPosicion);
             });
 
-            // Añadir jugadores seleccionados a sus posiciones
             jugadoresSeleccionados.forEach((jugador, indice) => {
                 if (indice < posicionesJugadores.length) {
                     const contenedor = document.createElement('div');
@@ -382,22 +356,18 @@
                     nuevaImagen.alt = jugador.dataset.player || '';
                     nuevaImagen.classList.add('player-img');
 
-                    // Obtener el nombre del jugador
                     const nombreJugador = jugador.parentElement.querySelector('.player-name') ?
                         jugador.parentElement.querySelector('.player-name').textContent :
                         '';
 
-                    // Crear elemento para el nombre
                     const nombreElemento = document.createElement('p');
                     nombreElemento.classList.add('player-name');
                     nombreElemento.textContent = nombreJugador;
 
-                    // Añadir número de posición
                     const numeroPosicion = document.createElement('span');
                     numeroPosicion.classList.add('final');
                     numeroPosicion.textContent = indice + 1;
 
-                    // Agregar elementos al contenedor
                     contenedor.appendChild(nuevaImagen);
                     contenedor.appendChild(nombreElemento);
 
@@ -409,19 +379,15 @@
         }
 
         function seleccionarJugador(elementoJugador) {
-            // Deseleccionar todos los jugadores
             seccionesJugadores.forEach(seccion => {
                 seccion.classList.remove('selected');
             });
 
-            // Seleccionar el jugador actual
             elementoJugador.parentElement.classList.add('selected');
             jugadorActual = elementoJugador;
         }
 
         function actualizarEstilosBotones() {
-            // Eliminar esta función para que los botones mantengan la misma opacidad
-            // O simplemente mantenerlos todos con opacidad 1
             botonAgregarInicio.style.opacity = '1';
             botonAgregarFinal.style.opacity = '1';
             botonAgregar.style.opacity = '1';
@@ -456,13 +422,11 @@
         }
 
         function manejarAccionFinal() {
-            // Para agregar, se necesita tener un jugador seleccionado
             if (accionActual === 'agregar' && !jugadorActual) {
                 alert('Necesitas seleccionar un jugador primero');
                 return;
             }
 
-            // Verificar si ya está lleno el equipo
             if (accionActual === 'agregar' && jugadoresSeleccionados.length >= posicionesJugadores.length) {
                 alert('Ya has seleccionado el máximo de jugadores permitidos.');
                 return;
@@ -470,13 +434,11 @@
 
             let valorInput = inputIndiceJugador.value;
 
-            // Para quitar, se requiere especificar una posición
             if (accionActual === 'quitar' && valorInput === "") {
                 alert('Debes especificar una posición para quitar un jugador');
                 return;
             }
 
-            // Procesar acciones con posición especificada
             if (valorInput !== "") {
                 let posicion = parseInt(valorInput);
 
@@ -495,7 +457,6 @@
                     return;
                 }
             } else {
-                // Sin posición especificada, solo aplica para agregar
                 if (accionActual === 'agregar') {
                     if (posicionActual === 'inicio') {
                         agregarJugadorASeleccion(jugadorActual, 1);
@@ -509,17 +470,14 @@
             inputIndiceJugador.value = "";
         }
 
-        // Event Listeners para imágenes de jugadores
         imagenesJugadores.forEach(img => {
             img.addEventListener('click', () => {
                 seleccionarJugador(img);
             });
         });
 
-        // Event Listeners para botones
         botonAgregarInicio.addEventListener('click', () => {
             posicionActual = 'inicio';
-            // Mantener opacidad igual en todos los botones
             actualizarEstilosBotones();
 
             if (jugadorActual) {
@@ -532,7 +490,6 @@
 
         botonAgregarFinal.addEventListener('click', () => {
             posicionActual = 'final';
-            // Mantener opacidad igual en todos los botones
             actualizarEstilosBotones();
 
             if (jugadorActual) {
@@ -545,17 +502,14 @@
 
         botonAgregar.addEventListener('click', () => {
             accionActual = 'agregar';
-            // Mantener opacidad igual en todos los botones
             actualizarEstilosBotones();
             manejarAccionFinal();
         });
 
         botonQuitar.addEventListener('click', () => {
             accionActual = 'quitar';
-            // Mantener opacidad igual en todos los botones
             actualizarEstilosBotones();
 
-            // Verificar si hay jugadores seleccionados
             if (jugadoresSeleccionados.length === 0) {
                 alert('No hay jugadores seleccionados para quitar');
                 return;
@@ -573,7 +527,6 @@
             }
         });
 
-        // Inicializar el estado de los botones con opacidad completa
         posicionActual = 'final';
         accionActual = 'agregar';
         actualizarEstilosBotones();
