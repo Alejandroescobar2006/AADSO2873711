@@ -1,0 +1,491 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sailor Moon Collector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a2e;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        section h4.clock {
+            font-size: 2.8rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        section input {
+            margin-top: 1rem;
+            border: 2px solid #b7a63c;
+            border-radius: 5px;
+            padding: 0.5rem;
+            width: 140px;
+        }
+
+        section button {
+            background-color: #b7a63c;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            padding: 0.6rem;
+            width: 160px;
+            margin-top: 10px;
+        }
+
+        h4.refresh {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        figure.sky {
+            background: url('/api/placeholder/400/240') no-repeat center/cover;
+            height: 240px;
+            width: 390px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 40px;
+            border: 4px solid rgb(199, 21, 199);
+            margin: 20px 0;
+        }
+
+        img.sailor {
+            position: absolute;
+            scale: .15;
+            top: -140px;
+            left: 15px;
+            transition: left 0.2s ease-in;
+        }
+
+        .star {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: yellow;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px white;
+        }
+
+        .score-board {
+            font-size: 2rem;
+            margin-top: 20px;
+            color: gold;
+        }
+
+        .instructions {
+            margin: 15px 0;
+            text-align: center;
+            background-color: rgba(183, 166, 60, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 390px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Sailor Moon Collector</h1>
+        <h2>¡Recolecta estrellas con el marinero!</h2>
+    </header>
+    <section>
+        <h3>Tiempo de Juego</h3>
+        <h4 class="clock">00:00:00</h4>
+        
+        <div class="instructions">
+            <p>Usa las teclas ← y → para mover al marinero y recolectar estrellas</p>
+            <p>Cada estrella vale 1 punto</p>
+        </div>
+        
+        <div class="score-board">Puntos: <span id="score">0</span></div>
+        
+        <h3>Reiniciar Juego</h3>
+        <input class="timeToRefresh" type="number" placeholder="segundos de juego">
+        <button class="btnSetTime">Iniciar Juego</button>
+        <h4 class="refresh"></h4>
+        
+        <figure class="sky">
+            <img src="/api/placeholder/200/200" alt="marinero" class="sailor">
+        </figure>
+    </section>
+
+    <script>
+        // Elementos
+        const clock = document.querySelector('.clock');
+        const timeRefresh = document.querySelector('.timeToRefresh');
+        const btnSetTime = document.querySelector('.btnSetTime');
+        const refresh = document.querySelector('.refresh');
+        const sky = document.querySelector('.sky');
+        const sailor = document.querySelector('.sailor');
+        const scoreElement = document.getElementById('score');
+        
+        // Variables del juego
+        let leftPosition = 0;
+        let score = 0;
+        let gameActive = false;
+        let starsInterval;
+        let stars = [];
+        
+        // Reloj digital
+        clock.textContent = "00:00:00";
+        setInterval(() => {
+            let currentTime = new Date().toLocaleTimeString();
+            clock.textContent = currentTime;
+        }, 1000);
+        
+        // Función para iniciar/reiniciar el juego
+        btnSetTime.addEventListener('click', () => {
+            if (!timeRefresh.value || timeRefresh.value <= 0) {
+                alert('¡Por favor, ingresa un número válido de segundos!');
+                return;
+            }
+            
+            // Reiniciar juego
+            score = 0;
+            scoreElement.textContent = score;
+            gameActive = true;
+            leftPosition = 0;
+            sailor.style.left = `${leftPosition}px`;
+            
+            // Eliminar estrellas existentes
+            document.querySelectorAll('.star').forEach(star => star.remove());
+            stars = [];
+            
+            // Detener intervalos anteriores
+            if (starsInterval) clearInterval(starsInterval);
+            
+            // Configurar cuenta regresiva
+            let count = 1;
+            let time = parseInt(timeRefresh.value);
+            refresh.textContent = `${time} segundos restantes`;
+            
+            const countdownInterval = setInterval(() => {
+                refresh.textContent = `${time - count} segundos restantes`;
+                count++;
+                
+                if (count > time) {
+                    clearInterval(countdownInterval);
+                    gameActive = false;
+                    refresh.textContent = `¡Juego terminado! Tu puntuación: ${score}`;
+                    
+                    // Detener la generación de estrellas
+                    clearInterval(starsInterval);
+                }
+            }, 1000);
+            
+            // Iniciar generación de estrellas
+            starsInterval = setInterval(createStar, 1500);
+            
+            // Configurar fin del juego
+            setTimeout(() => {
+                gameActive = false;
+                refresh.textContent = `¡Juego terminado! Tu puntuación final: ${score}`;
+                clearInterval(starsInterval);
+            }, (time * 1000));
+        });
+        
+        // Función para crear estrellas
+        function createStar() {
+            if (!gameActive) return;
+            
+            const star = document.createElement('div');
+            star.classList.add('star');
+            
+            // Posición aleatoria dentro del cielo
+            const topPosition = Math.random() * 200;
+            const leftPosition = Math.random() * 350;
+            
+            star.style.top = `${topPosition}px`;
+            star.style.left = `${leftPosition}px`;
+            
+            sky.appendChild(star);
+            stars.push(star);
+            
+            // Eliminar la estrella después de un tiempo
+            setTimeout(() => {
+                if (star.parentNode === sky) {
+                    sky.removeChild(star);
+                    const index = stars.indexOf(star);
+                    if (index > -1) {
+                        stars.splice(index, 1);
+                    }
+                }
+            }, 5000);
+        }
+        
+        // Función para verificar colisiones
+        function checkCollisions() {
+            if (!gameActive) return;
+            
+            const sailorRect = {
+                left: leftPosition,
+                right: leftPosition + 50,
+                top: -140,
+                bottom: 80
+            };
+            
+            stars.forEach((star, index) => {
+                if (!star.parentNode) return;
+                
+                const starRect = star.getBoundingClientRect();
+                const skyRect = sky.getBoundingClientRect();
+                
+                // Ajustar las coordenadas relativas al contenedor sky
+                const relativeStarRect = {
+                    left: starRect.left - skyRect.left,
+                    right: starRect.right - skyRect.left,
+                    top: starRect.top - skyRect.top,
+                    bottom: starRect.bottom - skyRect.top
+                };
+                
+                // Verificar colisión
+                if (sailorRect.right > relativeStarRect.left && 
+                    sailorRect.left < relativeStarRect.right && 
+                    sailorRect.bottom > relativeStarRect.top && 
+                    sailorRect.top < relativeStarRect.bottom) {
+                    
+                    // Colisión detectada
+                    sky.removeChild(star);
+                    stars.splice(index, 1);
+                    score++;
+                    scoreElement.textContent = score;
+                }
+            });
+        }
+        
+        // Control del marinero con las teclas de flecha
+        document.addEventListener('keyup', (event) => {
+            if (!gameActive) return;
+            
+            // Tecla izquierda
+            if (event.keyCode == 37) {
+                if (leftPosition > -180) {
+                    leftPosition -= 40;
+                    sailor.style.transform = `rotateY(0deg)`;
+                    sailor.style.left = `${leftPosition}px`;
+                } else {
+                    leftPosition = 200;
+                    sailor.style.display = `none`;
+                    setTimeout(() => {
+                        sailor.style.display = `block`;
+                    }, 200);
+                    sailor.style.left = `${leftPosition}px`;
+                }
+            }
+            
+            // Tecla derecha
+            if (event.keyCode == 39) {
+                if (leftPosition < 200) {
+                    leftPosition += 40;
+                    sailor.style.transform = `rotateY(180deg)`;
+                    sailor.style.left = `${leftPosition}px`;
+                } else {
+                    leftPosition = -200;
+                    sailor.style.display = `none`;
+                    setTimeout(() => {
+                        sailor.style.display = `block`;
+                    }, 200);
+                    sailor.style.left = `${leftPosition}px`;
+                }
+            }
+            
+            // Verificar colisiones después de cada movimiento
+            checkCollisions();
+        });
+        
+        // Comprobar colisiones periódicamente
+        setInterval(checkCollisions, 100);
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>events-time</title>
+    <link rel="stylesheet" href="css/master.css">
+    <style>
+        section h4.clock {
+            font-size: 2.8rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        section {
+            input {
+                margin-top: 1rem;
+                border: 2px solid #b7a63c;
+                border-radius: 5px;
+                padding: 0.5rem;
+                width: 140px;
+            }
+
+            button {
+                background-color: #b7a63c;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                color: #fff;
+                padding: 0.6rem;
+                width: 160px;
+            }
+        }
+
+        h4.refresh {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        figure.sky {
+            background: url(images/26/night-sky-full-moon.webp) no-repeat center/cover;
+            height: 240px;
+            margin: 0;
+            width: 390px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 40px;
+            border: 4px solid rgb(199, 21, 199);
+
+            img.sailor {
+                position: absolute;
+                scale: .15;
+                top: -140px;
+                left: 15px;
+                transition: left 0.2s ease-in;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <nav class="controls">
+        <a href="index.html">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                <path fill="#ffffff"
+                    d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
+            </svg>
+        </a>
+    </nav>
+    <main>
+        <header>
+            <h1>events-time</h1>
+            <h2>maneja eventos e intervalos basados en tiempo</h2>
+        </header>
+        <section>
+            <h3>setInterval: Digital Clock</h3>
+            <h4 class="clock"></h4>
+            <h3>SetTimeout: Refresh Page</h3>
+            <input class="timeToRefresh" type="number" placeholder="number of second">
+            <button class="btnSetTime">set time</button>
+            <h4 class="refresh"></h4>
+            <h3>Move Element: </h3>
+            <small> <strong>Press left & right keys</strong> </small>
+            <figure class="sky">
+                <img src="images/26/sailor.png" alt="" class="sailor">
+            </figure>
+        </section>
+    </main>
+    <script>
+        //elements
+        const clock = document.querySelector('.clock')
+        const timeRefresh = document.querySelector('.timeToRefresh')
+        const btnSetTime = document.querySelector('.btnSetTime')
+        const refresh = document.querySelector('.refresh')
+
+        //setInterval
+        clock.textContent = "loading..."
+        setInterval(() => {
+            let currentTime = new Date().toLocaleTimeString()
+            clock.textContent = currentTime
+        }, 1000)
+
+        //setTimeOut
+        btnSetTime.addEventListener('click', () => {
+            if (!timeRefresh.value.length > 0) {
+                alert('please, enter number in seconds!')
+            } else {
+                let count = 1
+                let time = parseInt(timeRefresh.value)
+                refresh.textContent = time + ' seconds to refresh'
+                setInterval(() => {
+                    refresh.textContent = (time - count) + ' seconds to refresh'
+                    count++
+                }, 1000)
+                setTimeout(() => {
+                    window.location.reload()
+                }, (time * 1000))
+            }
+        })
+
+        //event keyUp
+        //37 left
+        //39 right
+
+        const salor = document.querySelector('.sailor')
+        let leftPosition = 0
+
+        document.addEventListener('keyup', (event) => {
+            if (event.keyCode == 37) {
+                if (leftPosition > -180) {
+                    leftPosition -= 40
+                    salor.style.transform = `rotateY(0deg)`
+                    salor.style.left = `${leftPosition}px`
+                } else {
+                    leftPosition = 200
+                    salor.style.display = `none`
+                    setTimeout(() => {
+                        salor.style.display = `block`
+
+                    },200)
+                    salor.style.left = `${leftPosition}px`
+                }
+            }
+
+
+            if (event.keyCode == 39) {
+                if (leftPosition < 200) {
+                    leftPosition += 40
+                    salor.style.transform = `rotateY(180deg)`
+                    salor.style.left = `${leftPosition}px`
+                } else {
+                    leftPosition = -200
+                    salor.style.display = `none`
+                    setTimeout(() => {
+                        salor.style.display = `block`
+                    }, 200);
+                    salor.style.left = `${leftPosition}px`
+                }
+
+                console.log(leftPosition)
+            }
+        })
+
+    </script>
+
+    </main>
+</body>
+
+</html>

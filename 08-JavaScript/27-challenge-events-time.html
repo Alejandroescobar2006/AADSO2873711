@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deacubre la clave</title>
+    <link rel="stylesheet" href="css/master.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #7e9687;
+            font-family: 'Share Tech Mono', monospace;
+            text-align: center;
+        }
+        
+        .caja-juego {
+            width: 340px;
+            padding: 30px;
+            border: 3px solid #38ef7d;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(56, 239, 125, 0.3),
+                        inset 0 0 20px rgba(56, 239, 125, 0.2);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        .titulo-juego {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(56, 239, 125, 0.7);
+            letter-spacing: 2px;
+        }
+        
+        .cronometro {
+            font-size: 2.5em;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            width: 100px;
+            margin: 20px auto;
+            text-shadow: 0 0 10px rgba(56, 239, 125, 0.7);
+        }
+        
+        .contenedor-numeros {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .numero {
+            width: 50px;
+            height: 60px;
+            font-size: 28px;
+            text-align: center;
+            border: 2px solid #38ef7d;
+            background: rgba(0, 0, 0, 0.3);
+            color: #38ef7d;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        
+        .numero:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(56, 239, 125, 0.8);
+        }
+        
+        .correcto {
+            background: #38ef7d;
+            color: #0f172a;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.5);
+        }
+        
+        .contenedor-botones {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .boton {
+            background: linear-gradient(to right, #38ef7d, #11998e);
+            border: none;
+            padding: 15px 20px;
+            color: #0f172a;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+        }
+        
+        .boton:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(56, 239, 125, 0.4);
+        }
+        
+        .boton:active {
+            transform: translateY(1px);
+        }
+        
+        .boton:disabled {
+            background: #2c3e50;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+        
+        .boton-revisar {
+            background: #11998e;
+            color: #0f172a;
+        }
+        
+        /* Eliminar flechas de los inputs numéricos */
+        .numero::-webkit-outer-spin-button,
+        .numero::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .numero[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+    <div class="caja-juego">
+        <h1 class="titulo-juego">Descubre la clave</h1>
+        <div class="cronometro" id="cronometro">30</div>
+        <div class="contenedor-numeros">
+            <input type="number" class="numero" maxlength="1" min="0" max="9">
+            <input type="number" class="numero" maxlength="1" min="0" max="9">
+            <input type="number" class="numero" maxlength="1" min="0" max="9">
+            <input type="number" class="numero" maxlength="1" min="0" max="9">
+        </div>
+        <div class="contenedor-botones">
+            <button id="botonJugar" class="boton">Jugar</button>
+            <button id="botonRevisar" class="boton boton-revisar" disabled>Revisar</button>
+        </div>
+    </div>
+
+    <script>
+        const cronometro = document.getElementById('cronometro');
+        const numeros = document.querySelectorAll('.numero');
+        const botonJugar = document.getElementById('botonJugar');
+        const botonRevisar = document.getElementById('botonRevisar');
+        
+        let codigoSecreto;
+        let intervaloJuego;
+        let tiempoRestante;
+        let posicionesCorrectas = [false, false, false, false];
+        let juegoActivo = false;
+
+        // Inicializar - deshabilitar números
+        numeros.forEach(numero => {
+            numero.disabled = true;
+        });
+
+        botonJugar.onclick = () => {
+            clearInterval(intervaloJuego);
+            codigoSecreto = Math.floor(Math.random() * 9000 + 1000).toString();
+            tiempoRestante = 30;
+            posicionesCorrectas = [false, false, false, false];
+            juegoActivo = true;
+            
+            numeros.forEach((numero) => {
+                numero.value = '';
+                numero.classList.remove('correcto');
+                numero.disabled = false;
+            });
+
+            intervaloJuego = setInterval(() => {
+                tiempoRestante--;
+                cronometro.textContent = tiempoRestante;
+                if (tiempoRestante <= 0) finJuego(false);
+            }, 1000);
+
+            botonJugar.disabled = true;
+            botonRevisar.disabled = false;
+            numeros[0].focus();
+        };
+
+        // Manejar entradas de números
+        numeros.forEach((numero, index) => {
+            numero.addEventListener('input', (event) => {
+                if (event.target.value.length > 0) {
+                    event.target.value = event.target.value.slice(-1);
+                    
+                    // Mover al siguiente input si no es el último
+                    if (index < numeros.length - 1) {
+                        numeros[index + 1].focus();
+                    }
+                }
+            });
+
+            // Permitir navegación con la tecla de retroceso
+            numero.addEventListener('keydown', (event) => {
+                if (event.key === 'Backspace' && !event.target.value && index > 0) {
+                    numeros[index - 1].focus();
+                }
+            });
+        });
+
+        // Función para revisar
+        botonRevisar.onclick = () => {
+            if (!juegoActivo) return;
+            
+            // Verificar que todos los campos estén llenos
+            let todosLlenos = true;
+            
+            numeros.forEach(numero => {
+                if (numero.value === '') {
+                    todosLlenos = false;
+                }
+            });
+            
+            if (!todosLlenos) {
+                alert("Debes llenar todos los dígitos primero");
+                return;
+            }
+            
+            // Revisar cada dígito
+            let todosCorrectos = true;
+            
+            numeros.forEach((numero, index) => {
+                if (numero.value === codigoSecreto[index]) {
+                    numero.classList.add('correcto');
+                    posicionesCorrectas[index] = true;
+                    numero.disabled = true;
+                } else {
+                    todosCorrectos = false;
+                    numero.value = '';
+                }
+            });
+            
+            // Si todos son correctos, el jugador gana
+            if (todosCorrectos) {
+                finJuego(true);
+            } else {
+                // Enfocar el primer campo que no es correcto
+                for (let i = 0; i < numeros.length; i++) {
+                    if (!posicionesCorrectas[i]) {
+                        numeros[i].focus();
+                        break;
+                    }
+                }
+            }
+        };
+
+        function finJuego(ganado) {
+            clearInterval(intervaloJuego);
+            juegoActivo = false;
+            
+            numeros.forEach((numero, index) => {
+                numero.value = codigoSecreto[index];
+                numero.disabled = true;
+                if (ganado) {
+                    numero.classList.add('correcto');
+                }
+            });
+            
+            botonJugar.disabled = false;
+            botonRevisar.disabled = true;
+            
+            setTimeout(() => {
+                alert(ganado ? '¡Felicitaciones! Has descifrado la clave' : `Tiempo agotado. La clave era ${codigoSecreto}`);
+            }, 300);
+        }
+    </script>
+</body>
+</html>
